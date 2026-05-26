@@ -1,0 +1,6 @@
+com\example\demo\domain\Tour.class
+com\example\demo\DemoApplication.class
+com\example\demo\controller\TourController.class
+com\example\demo\config\AppConfig.class
+com\example\demo\repo\TourRepository.class
+com\example\demo\service\TourService.class
