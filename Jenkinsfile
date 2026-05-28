@@ -14,7 +14,7 @@ pipeline {
         }
         stage('Push') {
             steps {
-                echo 'Push'
+                echo 'Pushing'
             }
         }        
     }
