@@ -1,35 +1,66 @@
-pipeline { 
+pipeline {
     agent any
+
     environment {
-    ALIYUN_DOCKER_REGISTERY="crpi-uzkholcdutt858o7.cn-guangzhou.personal.cr.aliyuncs.com"
-}
-    tools {
-        nodejs 'nodejs_22'
+        PROJECT_DIR = '/Users/max/Development/learn_DevOps/react_app'
+        ALIYUN_DOCKER_REGISTRY = 'crpi-uzkholcdutt858o7.cn-guangzhou.personal.cr.aliyuncs.com'
+        ALIYUN_NAMESPACE = 'my_docker_registery'
+        IMAGE_REPO = 'react_app'
+        PATH = "/usr/local/bin:/opt/homebrew/bin:${env.PATH}"
     }
+
     stages {
-        stage('Checkout') {
+        stage('Prepare') {
             steps {
-                echo 'Checkout'
+                script {
+                    env.IMAGE_NAME = "${env.ALIYUN_DOCKER_REGISTRY}/${env.ALIYUN_NAMESPACE}/${env.IMAGE_REPO}:${env.BUILD_NUMBER}"
+                    env.IMAGE_LATEST = "${env.ALIYUN_DOCKER_REGISTRY}/${env.ALIYUN_NAMESPACE}/${env.IMAGE_REPO}:latest"
+                }
+
+                sh '''
+                    echo "Image: $IMAGE_NAME"
+                    docker version
+                    test -f "$PROJECT_DIR/Dockerfile"
+                '''
             }
         }
+
         stage('Build') {
             steps {
-                echo 'Building'
-                // navigate to /Users/max/Development/learn_DevOps/react_app and build docker image
-                dir('/Users/max/Development/learn_DevOps/react_app') {
-                    sh 'docker build -t react_app:latest .'
+                dir(env.PROJECT_DIR) {
+                    sh '''
+                        docker build -t "$IMAGE_NAME" .
+                        docker tag "$IMAGE_NAME" "$IMAGE_LATEST"
+                    '''
                 }
             }
         }
-        stage('Push') {
+
+        stage('Login and Push') {
             steps {
-                echo 'Pushing'
+                withCredentials([
+                    usernamePassword(
+                        credentialsId: 'aliyun-docker-registery-token',
+                        usernameVariable: 'ALIYUN_USERNAME',
+                        passwordVariable: 'ALIYUN_PASSWORD'
+                    )
+                ]) {
+                    sh '''
+                        echo "$ALIYUN_PASSWORD" | docker login \
+                          --username "$ALIYUN_USERNAME" \
+                          --password-stdin "$ALIYUN_DOCKER_REGISTRY"
+
+                        docker push "$IMAGE_NAME"
+                        docker push "$IMAGE_LATEST"
+                    '''
+                }
             }
-        }        
+        }
+    }
+
+    post {
+        always {
+            sh 'docker logout "$ALIYUN_DOCKER_REGISTRY" || true'
+        }
     }
 }
-
-
-
-
-
