@@ -1,0 +1,35 @@
+pipeline { 
+    agent any
+    environment {
+    ALIYUN_DOCKER_REGISTERY="crpi-uzkholcdutt858o7.cn-guangzhou.personal.cr.aliyuncs.com"
+}
+    tools {
+        nodejs 'nodejs_22'
+    }
+    stages {
+        stage('Checkout') {
+            steps {
+                echo 'Checkout'
+            }
+        }
+        stage('Build') {
+            steps {
+                echo 'Building'
+                // navigate to /Users/max/Development/learn_DevOps/react_app and build docker image
+                dir('/Users/max/Development/learn_DevOps/react_app') {
+                    sh 'docker build -t react_app:latest .'
+                }
+            }
+        }
+        stage('Push') {
+            steps {
+                echo 'Pushing'
+            }
+        }        
+    }
+}
+
+
+
+
+
