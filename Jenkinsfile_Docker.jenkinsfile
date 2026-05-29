@@ -4,8 +4,8 @@ pipeline {
     environment {
         PROJECT_DIR = '/Users/max/Development/learn_DevOps/react_app'
         ALIYUN_DOCKER_REGISTRY = 'crpi-uzkholcdutt858o7.cn-guangzhou.personal.cr.aliyuncs.com'
-        ALIYUN_NAMESPACE = 'my_docker_registery'
-        IMAGE_REPO = 'react_app'
+        ALIYUN_NAMESPACE = 'max_docker_registery'
+        IMAGE_REPO = 'my_docker_registery'
         PATH = "/usr/local/bin:/opt/homebrew/bin:${env.PATH}"
     }
 
